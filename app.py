@@ -5,6 +5,8 @@ import plotly.express as px
 from datetime import date,datetime,timedelta
 from jugaad_data.nse import stock_df
 import pandas as pd
+import yfinance as yf
+import filter_definitions
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Replace with your actual secret key
@@ -41,7 +43,7 @@ company_symbol_map = {
     "Infosys Ltd.": "INFY",
     "JSW Steel Ltd.": "JSWSTEEL",
     "Kotak Mahindra Bank Ltd.": "KOTAKBANK",
-    "LTIMindtree Ltd.": "LTIM",
+    "L&T Finance Holdings Limited": "LTIM",
     "Larsen & Toubro Ltd.": "LT",
     "Maruti Suzuki India Ltd.": "MARUTI",
     "NTPC Ltd.": "NTPC",
@@ -62,6 +64,64 @@ company_symbol_map = {
     "UltraTech Cement Ltd.": "ULTRACEMCO",
     "Wipro Ltd.": "WIPRO"
 }
+
+#--------------------------------------------------------------------
+
+
+#---------------yfinance Map----------------------------------------------------
+yf_map = {
+    'Adani Enterprises Limited': 'ADANIENT.NS',
+    'Adani Ports and Special Economic Zone Ltd.': 'ADANIPORTS.NS',
+    'Apollo Hospitals Enterprise Limited': 'APOLLOHOSP.NS',
+    'Asian Paints Limited': 'ASIANPAINT.NS',
+    'Axis Bank Limited': 'AXISBANK.NS',
+    'Bajaj Auto Limited': 'BAJAJ-AUTO.NS',
+    'Bajaj Finance Limited': 'BAJFINANCE.NS',
+    'Bajaj Finserv Limited': 'BAJAJFINSV.NS',
+    'Bharat Petroleum Corporation Limited': 'BPCL.NS',
+    'Bharti Airtel Limited': 'BHARTIARTL.NS',
+    'Britannia Industries Limited': 'BRITANNIA.NS',
+    'Cipla Limited': 'CIPLA.NS',
+    'Coal India Limited': 'COALINDIA.NS',
+    'Divi\'s Laboratories Limited': 'DIVISLAB.NS',
+    'Dr. Reddy\'s Laboratories Limited': 'DRREDDY.NS',
+    'Eicher Motors Limited': 'EICHERMOT.NS',
+    'Grasim Industries Limited': 'GRASIM.NS',
+    'HCL Technologies Limited': 'HCLTECH.NS',
+    'HDFC Bank Limited': 'HDFCBANK.NS',
+    'HDFC Life Insurance Company Limited': 'HDFCLIFE.NS',
+    'Hero MotoCorp Limited': 'HEROMOTOCO.NS',
+    'Hindalco Industries Limited': 'HINDALCO.NS',
+    'Hindustan Unilever Limited': 'HINDUNILVR.NS',
+    'ICICI Bank Limited': 'ICICIBANK.NS',
+    'ITC Limited': 'ITC.NS',
+    'IndusInd Bank Limited': 'INDUSINDBK.NS',
+    'Infosys Limited': 'INFY.NS',
+    'JSW Steel Limited': 'JSWSTEEL.NS',
+    'Kotak Mahindra Bank Limited': 'KOTAKBANK.NS',
+    'LTIMindtree Limited': 'LTIM.NS',
+    'Larsen & Toubro Limited': 'LT.NS',
+    'Maruti Suzuki India Limited': 'MARUTI.NS',
+    'NTPC Limited': 'NTPC.NS',
+    'Nestle India Limited': 'NESTLEIND.NS',
+    'Oil & Natural Gas Corporation Limited': 'ONGC.NS',
+    'Power Grid Corporation of India Limited': 'POWERGRID.NS',
+    'Reliance Industries Limited': 'RELIANCE.NS',
+    'SBI Life Insurance Company Limited': 'SBILIFE.NS',
+    'State Bank of India': 'SBIN.NS',
+    'Sun Pharmaceutical Industries Limited': 'SUNPHARMA.NS',
+    'Tata Consultancy Services Limited': 'TCS.NS',
+    'Tata Consumer Products Limited': 'TATACONSUM.NS',
+    'Tata Motors Limited': 'TATAMOTORS.NS',
+    'Tata Steel Limited': 'TATASTEEL.NS',
+    'Tech Mahindra Limited': 'TECHM.NS',
+    'Titan Company Limited': 'TITAN.NS',
+    'UPL Limited': 'UPL.NS',
+    'UltraTech Cement Limited': 'ULTRACEMCO.NS',
+    'Wipro Limited': 'WIPRO.NS'
+}
+
+
 #--------------------------------------------------------------------
 
 # Database Configuration
@@ -131,6 +191,102 @@ def explore():
     return render_template('explore.html',username=session['username'])   
 
 
+
+@app.route('/history_analysis')
+def history_analysis():
+    return render_template('history_analysis.html',username=session['username'])  
+
+
+@app.route('/filters')
+def filters():
+    return render_template('filters.html',username=session['username'])
+
+
+
+@app.route('/intermediate_filter',methods = ['POST'])
+def intermediate_filter():
+    if request.method=='POST':
+        filters_selected = request.form.getlist("filter_category")
+        PE_filter = 0
+        avg_price = 0
+        market_cap = 0
+        sectors_selected = []
+        filtered_companies = []
+        first_filter_flag = 0
+        if "PE_ratio" in filters_selected:
+            PE_filter = request.form.get("PE_ratio")
+            if first_filter_flag==0:
+                filtered_companies = filter_definitions.filter_by_pe(PE_filter)
+                first_filter_flag = 1
+            else :
+                temp_list = filter_definitions.filter_by_pe(PE_filter)
+                filtered_companies = [value for value in temp_list if value in filtered_companies]
+
+        if "Avg_price" in filters_selected:
+            avg_price = request.form.get("Avg_price")
+            if first_filter_flag==0:
+                filtered_companies = filter_definitions.filter_by_avg(avg_price)
+                first_filter_flag = 1
+            else:
+                temp_list = filter_definitions.filter_by_avg(avg_price)
+                filtered_companies = [value for value in temp_list if value in filtered_companies]
+
+        if "Market_cap" in filters_selected:
+            market_cap = request.form.get("Market_cap")
+            if first_filter_flag==0:
+                filtered_companies = filter_definitions.filter_by_mc(market_cap)
+                first_filter_flag=1
+            else:
+                temp_list = filter_definitions.filter_by_mc(market_cap)
+                filtered_companies = [value for value in temp_list if value in filtered_companies]
+
+
+        if "selected_sector" in filters_selected:
+            sectors_selected = request.form.getlist("selected_sector")
+            if first_filter_flag==0:
+                filtered_companies = filter_definitions.filter_by_sector(sectors_selected)
+                first_filter_flag=1
+            else:
+                temp_list = filter_definitions.filter_by_sector(sectors_selected)
+                filtered_companies = [value for value in temp_list if value in filtered_companies]
+
+        if first_filter_flag==0:
+            return redirect(url_for('filters'))
+        filtered_companies_data = []
+        company_data = []
+        current_date = date.today().strftime('%Y-%m-%d')
+        for filtered_company in filtered_companies:
+            symbol = yf_map[filtered_company]
+            stock = yf.Ticker(symbol)
+            info = stock.info
+            history = stock.history(start=current_date)  
+            average_price = history['Close'].mean()
+            filtered_companies_data.append({
+                'Symbol': symbol,
+                'Company_Name': info.get('longName', ''),
+                'Sector': info.get('industry', ''),
+                'Market_Cap': info.get('marketCap', ''),
+                'Previous_Close': info.get('regularMarketPreviousClose', ''),
+                'PE_Ratio': info.get('trailingPE', ''),
+                'Monthly_avg': average_price,
+            })
+
+
+        
+        return render_template('result_filter.html',filtered_companies_data = filtered_companies_data)
+
+
+
+    else:
+        return redirect(url_for('filters'))
+
+
+
+
+
+
+
+
 @app.route('/intermediate',methods = ['POST'])
 def intermediate():
     if request.method == 'POST':
@@ -178,13 +334,7 @@ def intermediate():
     
 
 
-# @app.route('/result_plot')
-# def result_plot():
-#     plot_html = session.pop('plot_html', None)
-#     if plot_html:
-#         return render_template('result_plot.html', plot_html=plot_html)
-#     else:
-#         return "Plot HTML not found in session."
+
 
 @app.route('/logout')
 def logout():
