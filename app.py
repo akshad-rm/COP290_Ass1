@@ -3,12 +3,15 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import plotly.express as px
 from datetime import date,datetime,timedelta
-from jugaad_data.nse import stock_df
+from jugaad_data.nse import stock_df,NSELive
 import pandas as pd
 import yfinance as yf
+from sqlalchemy.orm import relationship
+
 import filter_definitions
 
 app = Flask(__name__)
+
 app.secret_key = 'your_secret_key'  # Replace with your actual secret key
 
 
@@ -70,59 +73,129 @@ company_symbol_map = {
 
 #---------------yfinance Map----------------------------------------------------
 yf_map = {
-    'Adani Enterprises Limited': 'ADANIENT.NS',
-    'Adani Ports and Special Economic Zone Ltd.': 'ADANIPORTS.NS',
-    'Apollo Hospitals Enterprise Limited': 'APOLLOHOSP.NS',
-    'Asian Paints Limited': 'ASIANPAINT.NS',
-    'Axis Bank Limited': 'AXISBANK.NS',
-    'Bajaj Auto Limited': 'BAJAJ-AUTO.NS',
-    'Bajaj Finance Limited': 'BAJFINANCE.NS',
-    'Bajaj Finserv Limited': 'BAJAJFINSV.NS',
-    'Bharat Petroleum Corporation Limited': 'BPCL.NS',
-    'Bharti Airtel Limited': 'BHARTIARTL.NS',
-    'Britannia Industries Limited': 'BRITANNIA.NS',
-    'Cipla Limited': 'CIPLA.NS',
-    'Coal India Limited': 'COALINDIA.NS',
-    'Divi\'s Laboratories Limited': 'DIVISLAB.NS',
-    'Dr. Reddy\'s Laboratories Limited': 'DRREDDY.NS',
-    'Eicher Motors Limited': 'EICHERMOT.NS',
-    'Grasim Industries Limited': 'GRASIM.NS',
-    'HCL Technologies Limited': 'HCLTECH.NS',
-    'HDFC Bank Limited': 'HDFCBANK.NS',
-    'HDFC Life Insurance Company Limited': 'HDFCLIFE.NS',
-    'Hero MotoCorp Limited': 'HEROMOTOCO.NS',
-    'Hindalco Industries Limited': 'HINDALCO.NS',
-    'Hindustan Unilever Limited': 'HINDUNILVR.NS',
-    'ICICI Bank Limited': 'ICICIBANK.NS',
-    'ITC Limited': 'ITC.NS',
-    'IndusInd Bank Limited': 'INDUSINDBK.NS',
-    'Infosys Limited': 'INFY.NS',
-    'JSW Steel Limited': 'JSWSTEEL.NS',
-    'Kotak Mahindra Bank Limited': 'KOTAKBANK.NS',
-    'LTIMindtree Limited': 'LTIM.NS',
-    'Larsen & Toubro Limited': 'LT.NS',
-    'Maruti Suzuki India Limited': 'MARUTI.NS',
-    'NTPC Limited': 'NTPC.NS',
-    'Nestle India Limited': 'NESTLEIND.NS',
-    'Oil & Natural Gas Corporation Limited': 'ONGC.NS',
-    'Power Grid Corporation of India Limited': 'POWERGRID.NS',
-    'Reliance Industries Limited': 'RELIANCE.NS',
-    'SBI Life Insurance Company Limited': 'SBILIFE.NS',
-    'State Bank of India': 'SBIN.NS',
-    'Sun Pharmaceutical Industries Limited': 'SUNPHARMA.NS',
-    'Tata Consultancy Services Limited': 'TCS.NS',
-    'Tata Consumer Products Limited': 'TATACONSUM.NS',
-    'Tata Motors Limited': 'TATAMOTORS.NS',
-    'Tata Steel Limited': 'TATASTEEL.NS',
-    'Tech Mahindra Limited': 'TECHM.NS',
-    'Titan Company Limited': 'TITAN.NS',
-    'UPL Limited': 'UPL.NS',
-    'UltraTech Cement Limited': 'ULTRACEMCO.NS',
-    'Wipro Limited': 'WIPRO.NS'
+    "Adani Enterprises Limited"  :  "ADANIENT.NS" ,
+    "Adani Ports and Special Economic Zone Limited"  :  "ADANIPORTS.NS" ,
+    "Apollo Hospitals Enterprise Limited"  :  "APOLLOHOSP.NS" ,
+    "Asian Paints Limited"  :  "ASIANPAINT.NS" ,
+    "Axis Bank Limited"  :  "AXISBANK.NS" ,
+    "Bajaj Auto Limited"  :  "BAJAJ-AUTO.NS" ,
+    "Bajaj Finance Limited"  :  "BAJFINANCE.NS" ,
+    "Bajaj Finserv Ltd."  :  "BAJAJFINSV.NS" ,
+    "Bharat Petroleum Corporation Limited"  :  "BPCL.NS" ,
+    "Bharti Airtel Limited"  :  "BHARTIARTL.NS" ,
+    "Britannia Industries Limited"  :  "BRITANNIA.NS" ,
+    "Cipla Limited"  :  "CIPLA.NS" ,
+    "Coal India Limited"  :  "COALINDIA.NS" ,
+    "Divi's Laboratories Limited"  :  "DIVISLAB.NS" ,
+    "Dr. Reddy's Laboratories Limited"  :  "DRREDDY.NS" ,
+    "Eicher Motors Limited"  :  "EICHERMOT.NS" ,
+    "Grasim Industries Limited"  :  "GRASIM.NS" ,
+    "HCL Technologies Limited"  :  "HCLTECH.NS" ,
+    "HDFC Bank Limited"  :  "HDFCBANK.NS" ,
+    "HDFC Life Insurance Company Limited"  :  "HDFCLIFE.NS" ,
+    "Hero MotoCorp Limited"  :  "HEROMOTOCO.NS" ,
+    "Hindalco Industries Limited"  :  "HINDALCO.NS" ,
+    "Hindustan Unilever Limited"  :  "HINDUNILVR.NS" ,
+    "ICICI Bank Limited"  :  "ICICIBANK.NS" ,
+    "ITC Limited"  :  "ITC.NS" ,
+    "IndusInd Bank Limited"  :  "INDUSINDBK.NS" ,
+    "Infosys Limited"  :  "INFY.NS" ,
+    "JSW Steel Limited"  :  "JSWSTEEL.NS" ,
+    "Kotak Mahindra Bank Limited"  :  "KOTAKBANK.NS" ,
+    "LTIMindtree Limited"  :  "LTIM.NS" ,
+    "Larsen & Toubro Limited"  :  "LT.NS" ,
+    "Maruti Suzuki India Limited"  :  "MARUTI.NS" ,
+    "NTPC Limited"  :  "NTPC.NS" ,
+    "Nestlé India Limited"  :  "NESTLEIND.NS" ,
+    "Oil and Natural Gas Corporation Limited"  :  "ONGC.NS" ,
+    "Power Grid Corporation of India Limited"  :  "POWERGRID.NS" ,
+    "Reliance Industries Limited"  :  "RELIANCE.NS" ,
+    "SBI Life Insurance Company Limited"  :  "SBILIFE.NS" ,
+    "State Bank of India"  :  "SBIN.NS" ,
+    "Sun Pharmaceutical Industries Limited"  :  "SUNPHARMA.NS" ,
+    "Tata Consultancy Services Limited"  :  "TCS.NS" ,
+    "Tata Consumer Products Limited"  :  "TATACONSUM.NS" ,
+    "Tata Motors Limited"  :  "TATAMOTORS.NS" ,
+    "Tata Steel Limited"  :  "TATASTEEL.NS" ,
+    "Tech Mahindra Limited"  :  "TECHM.NS" ,
+    "Titan Company Limited"  :  "TITAN.NS" ,
+    "UPL Limited"  :  "UPL.NS" ,
+    "UltraTech Cement Limited"  :  "ULTRACEMCO.NS" ,
+    "Wipro Limited"  :  "WIPRO.NS" 
 }
 
 
 #--------------------------------------------------------------------
+
+#---------------stock index map----------------------------------------------------
+stocks_index = {
+    'ADANIENT': 0,
+    'ADANIPORTS': 1,
+    'APOLLOHOSP': 2,
+    'ASIANPAINT': 3,
+    'AXISBANK': 4,
+    'BAJAJ-AUTO': 5,
+    'BAJFINANCE': 6,
+    'BAJAJFINSV': 7,
+    'BPCL': 8,
+    'BHARTIARTL': 9,
+    'BRITANNIA': 10,
+    'CIPLA': 11,
+    'COALINDIA': 12,
+    'DIVISLAB': 13,
+    'DRREDDY': 14,
+    'EICHERMOT': 15,
+    'GRASIM': 16,
+    'HCLTECH': 17,
+    'HDFCBANK': 18,
+    'HDFCLIFE': 19,
+    'HEROMOTOCO': 20,
+    'HINDALCO': 21,
+    'HINDUNILVR': 22,
+    'ICICIBANK': 23,
+    'ITC': 24,
+    'INDUSINDBK': 25,
+    'INFY': 26,
+    'JSWSTEEL': 27,
+    'KOTAKBANK': 28,
+    'LTIM': 29,
+    'LT': 30,
+    'MARUTI': 31,
+    'NTPC': 32,
+    'NESTLEIND': 33,
+    'ONGC': 34,
+    'POWERGRID': 35,
+    'RELIANCE': 36,
+    'SBILIFE': 37,
+    'SBIN': 38,
+    'SUNPHARMA': 39,
+    'TCS': 40,
+    'TATACONSUM': 41,
+    'TATAMOTORS': 42,
+    'TATASTEEL': 43,
+    'TECHM': 44,
+    'TITAN': 45,
+    'UPL': 46,
+    'ULTRACEMCO': 47,
+    'WIPRO': 48
+}
+
+#--------------------------------------------------------------------
+
+
+#-----------------------feeding live data----------------------------
+nse_data_obj = NSELive()
+company_stocks=[]
+for company in company_symbol_map:
+    quote = nse_data_obj.stock_quote(company_symbol_map[company])
+    temp_dict = {}
+    temp_dict["symbol"] = company_symbol_map[company]
+    temp_dict["name"] = company
+    temp_dict["price"] = quote["priceInfo"]["lastPrice"]
+    company_stocks.append(temp_dict)
+
+#---------------------------------------------------------------------
+
 
 # Database Configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
@@ -134,6 +207,13 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
+    investments = {}
+    stocks = {}
+    
+
+
+
+
 
 # Initialize Database within Application Context
 with app.app_context():
@@ -141,10 +221,8 @@ with app.app_context():
 
 @app.route('/')
 def index():
-    if 'user_id' in session:
-        return redirect(url_for('dashboard'))
-    else :
-        return render_template('login.html')
+
+    return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -152,7 +230,6 @@ def register():
         username = request.form['username']
         password = request.form['password']
         hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
-
         new_user = User(username=username, password_hash=hashed_password)
         db.session.add(new_user)
         db.session.commit()
@@ -332,6 +409,72 @@ def intermediate():
     else:
         return redirect(url_for('explore'))
     
+
+
+
+@app.route('/transactions')
+def transactions():
+    if 'user_id' in session:
+        user = User.Session.get(session['user_id'])
+        print(session['user_id'])
+        total_investment = sum(user.investments.values())
+        return render_template('trading.html', stocks=company_stocks, user_account=user, total_investment=total_investment)
+    else :
+        return render_template(url_for('login'))
+
+
+
+
+
+@app.route('/buy', methods=['POST'])
+def buy_stock():
+    user = User.Session.get(session['user_id'])
+    total_investment = sum(user.investments.values())
+    symbol = request.form.get('symbol')
+    quantity = int(request.form.get('quantity'))
+
+    stock = next((s for s in company_stocks if s['symbol'] == symbol), None)
+    if stock:
+        # Update the investments
+        investment = stock['price'] * quantity
+        if symbol in user.investments:
+            user.investments[symbol] += investment
+        else:
+            user.investments[symbol] = investment
+
+        # Add or update the stock in the user's portfolio
+        if symbol in user.stocks:
+            user.stocks[symbol] += quantity
+        else:
+            user.stocks[symbol] = quantity
+
+    return redirect(url_for('transactions'))
+
+
+@app.route('/sell', methods=['POST'])
+def sell_stock():
+    symbol = request.form.get('symbol')
+    quantity = int(request.form.get('quantity'))
+    user = User.Session.get(session['user_id'])
+    print(session['user_id'])
+    total_investment = sum(user.investments.values())
+    if symbol in user.stocks and user.stocks[symbol] >= quantity:
+        # Subtract the sold quantity from the user's portfolio
+        user.stocks[symbol] -= quantity
+
+        # Update the investments accordingly
+        investment = company_stocks[stocks_index[symbol]]['price'] * quantity
+        user.investments[symbol] -= investment
+
+        # Remove the stock from the portfolio if the quantity becomes zero
+        if user.stocks[symbol] == 0:
+            del user.stocks[symbol]
+            del user.investments[symbol]
+
+    return redirect(url_for('transactions'))
+
+
+
 
 
 
