@@ -7,7 +7,7 @@ from jugaad_data.nse import stock_df,NSELive
 import pandas as pd
 import yfinance as yf
 from sqlalchemy.orm import relationship
-
+from flask_migrate import Migrate 
 import filter_definitions
 
 app = Flask(__name__)
@@ -201,14 +201,27 @@ for company in company_symbol_map:
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-
+migrate = Migrate(app, db)
 # User Model
+class Investment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    symbol = db.Column(db.String(10), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+class Stock(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    symbol = db.Column(db.String(10), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
-    investments = {}
-    stocks = {}
+    investments = db.relationship('Investment', backref='user', lazy=True)
+    stocks = db.relationship('Stock', backref='user', lazy=True)
+
     
 
 
@@ -415,12 +428,12 @@ def intermediate():
 @app.route('/transactions')
 def transactions():
     if 'user_id' in session:
-        user = User.Session.get(session['user_id'])
-        print(session['user_id'])
-        total_investment = sum(user.investments.values())
+        user = User.query.get(session['user_id'])
+        total_investment = sum(investment.amount for investment in user.investments)
         return render_template('trading.html', stocks=company_stocks, user_account=user, total_investment=total_investment)
-    else :
-        return render_template(url_for('login'))
+    else:
+        return redirect(url_for('login'))
+
 
 
 
@@ -428,53 +441,53 @@ def transactions():
 
 @app.route('/buy', methods=['POST'])
 def buy_stock():
-    user = User.Session.get(session['user_id'])
-    total_investment = sum(user.investments.values())
+    user = User.query.get(session['user_id'])
     symbol = request.form.get('symbol')
     quantity = int(request.form.get('quantity'))
 
     stock = next((s for s in company_stocks if s['symbol'] == symbol), None)
     if stock:
-        # Update the investments
-        investment = stock['price'] * quantity
-        if symbol in user.investments:
-            user.investments[symbol] += investment
-        else:
-            user.investments[symbol] = investment
+        # Update the investments in the database
+        investment_amount = stock['price'] * quantity
+        investment = Investment(symbol=symbol, amount=investment_amount, user_id=user.id)
+        db.session.add(investment)
+        db.session.commit()
 
-        # Add or update the stock in the user's portfolio
-        if symbol in user.stocks:
-            user.stocks[symbol] += quantity
+        # Add or update the stock in the user's portfolio in the database
+        user_stock = Stock.query.filter_by(symbol=symbol, user_id=user.id).first()
+        if user_stock:
+            user_stock.quantity += quantity
         else:
-            user.stocks[symbol] = quantity
+            user_stock = Stock(symbol=symbol, quantity=quantity, user_id=user.id)
+            db.session.add(user_stock)
+        db.session.commit()
 
     return redirect(url_for('transactions'))
-
 
 @app.route('/sell', methods=['POST'])
 def sell_stock():
     symbol = request.form.get('symbol')
     quantity = int(request.form.get('quantity'))
-    user = User.Session.get(session['user_id'])
-    print(session['user_id'])
-    total_investment = sum(user.investments.values())
-    if symbol in user.stocks and user.stocks[symbol] >= quantity:
-        # Subtract the sold quantity from the user's portfolio
-        user.stocks[symbol] -= quantity
+    user = User.query.get(session['user_id'])
 
-        # Update the investments accordingly
-        investment = company_stocks[stocks_index[symbol]]['price'] * quantity
-        user.investments[symbol] -= investment
+    user_stock = Stock.query.filter_by(symbol=symbol, user_id=user.id).first()
+    if user_stock and user_stock.quantity >= quantity:
+        # Subtract the sold quantity from the user's portfolio in the database
+        user_stock.quantity -= quantity
+        db.session.commit()
 
-        # Remove the stock from the portfolio if the quantity becomes zero
-        if user.stocks[symbol] == 0:
-            del user.stocks[symbol]
-            del user.investments[symbol]
+        # Update the investments accordingly in the database
+        investment_amount = company_stocks[stocks_index[symbol]]['price'] * quantity
+        investment = Investment(symbol=symbol, amount=-investment_amount, user_id=user.id)
+        db.session.add(investment)
+        db.session.commit()
+
+        # Remove the stock from the portfolio if the quantity becomes zero in the database
+        if user_stock.quantity == 0:
+            db.session.delete(user_stock)
+            db.session.commit()
 
     return redirect(url_for('transactions'))
-
-
-
 
 
 
