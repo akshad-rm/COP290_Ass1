@@ -12,7 +12,7 @@ import filter_definitions
 
 app = Flask(__name__)
 
-app.secret_key = 'your_secret_key'  # Replace with your actual secret key
+app.secret_key = 'your_secret_key'  
 
 
 #---------------Map----------------------------------------------------
@@ -409,7 +409,8 @@ def intermediate():
                         dict(count=1, label="1m", step="month", stepmode="backward"),
                         dict(count=1, label="1y", step="year", stepmode="backward"),
                         dict(step="all")
-                    ])
+                    ]),
+                    
                 ),
                 rangeslider=dict(visible=True),
                 type="date"
@@ -490,6 +491,11 @@ def sell_stock():
     return redirect(url_for('transactions'))
 
 
+
+@app.route('/live_data')
+def live_data():
+    company_data = filter_definitions.nifty_50_data
+    return render_template('live_data.html',companies = company_data)
 
 
 @app.route('/logout')
