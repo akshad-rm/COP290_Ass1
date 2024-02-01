@@ -7,19 +7,34 @@
       type="text/css"
       href="{{ url_for('static', filename='style.css') }}"
     />
+    <style>
+      body {
+        background-image: url("static/back_image.png");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+    </style>
   </head>
   <body>
     <div class="topnav">
-      <img src="{{ url_for('static', filename='logo.png') }}" alt="Company Logo" class="logo">
+      <img
+        src="{{ url_for('static', filename='logo.png') }}"
+        alt="Company Logo"
+        class="logo"
+      />
       <a class="active" href="/dashboard">Home Page</a>
       <a href="/explore">Explore</a>
       <a href="/transactions">Transactions</a>
       <a href="/logout" class="logout-button">Logout</a>
     </div>
     <div class="welcome-container">
-      <h1>Welcome, {{ username }} !</h1>
+      <h1 class="title">Welcome, {{ username }} !</h1>
       <p>This is Stonx, the go-to website for all your stock needs.</p>
-      <p>Visit the Explore Tab to pick the right stocks by analysing past data, live trends and technical filters.</p>
+      <p>
+        Visit the Explore Tab to pick the right stocks by analysing past data,
+        live trends and technical filters.
+      </p>
       <p>Switch over to the Transactions Tab to buy or sell stocks.</p>
       <p>Thanks for visiting !</p>
     </div>
