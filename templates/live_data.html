@@ -39,7 +39,6 @@
       <div class="main-content">
         <h2>Company Information</h2>
         <div id="company-info">
-          <!-- Company information will be displayed here -->
         </div>
         <a href="/explore" class="back-to-explore">Back to Explore</a>
       </div>
@@ -54,10 +53,9 @@
         var symbol = this.dataset.symbol;
         var name = this.textContent;
         var price = this.dataset.price;
-        var change = parseFloat(this.dataset.change); // Parse to float
-        var pchange = parseFloat(this.dataset.pchange); // Parse to float
+        var change = parseFloat(this.dataset.change); 
+        var pchange = parseFloat(this.dataset.pchange); 
 
-        // Determine color classes based on the sign of change and pchange
         var changeColorClass = change < 0 ? 'negative' : 'positive';
         var pchangeColorClass = pchange < 0 ? 'negative' : 'positive';
 
