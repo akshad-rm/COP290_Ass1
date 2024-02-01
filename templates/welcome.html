@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Welcome</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="topnav">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="Company Logo" class="logo">
+      <a class="active" href="/dashboard">Home Page</a>
+      <a href="/explore">Explore</a>
+      <a href="/transactions">Transactions</a>
+      <a href="/logout" class="logout-button">Logout</a>
+    </div>
+    <div class="welcome-container">
+      <h1>Welcome, {{ username }} !</h1>
+      <p>This is Stonx, the go-to website for all your stock needs.</p>
+      <p>Visit the Explore Tab to pick the right stocks by analysing past data, live trends and technical filters.</p>
+      <p>Switch over to the Transactions Tab to buy or sell stocks.</p>
+      <p>Thanks for visiting !</p>
+    </div>
+  </body>
+</html>

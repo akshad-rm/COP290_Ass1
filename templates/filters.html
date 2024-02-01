@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply Filters</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .input-bar,
+        .sector-checkboxes {
+            display: none;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #333;
+        }
+
+        .container {
+            display: flex;
+            background-color: #333;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .form-container {
+            background-color: #333;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+            padding: 20px;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .checkbox-group {
+            margin-bottom: 20px;
+        }
+
+        .checkbox-option {
+            margin-bottom: 10px;
+        }
+
+        label {
+            margin-bottom: 5px;
+            display: block;
+            font-weight: bold;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+
+        .sector-checkboxes {
+            margin-top: 10px;
+        }
+
+        button {
+            background-color: #04aa6d;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #027353;
+        }
+    </style>
+</head>
+<body>
+
+<div class="topnav">
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Company Logo" class="logo">
+    <a href="/dashboard">Home Page</a>
+    <a class="active" href="/explore">Explore</a>
+    <a href="/transactions">Transactions</a>
+    <a href="/logout" class="logout-button">Logout</a>
+</div>
+
+<div class="container">
+    <h1 class="title">Apply Filters</h1>
+
+    <div class="form-container">
+        <form action="/intermediate_filter" method="post" class="filter-form">
+            <div class="checkbox-group">
+                <div class="checkbox-option">
+                    <label><input type="checkbox" name="filter_category" value="PE_ratio" /> By P/E Ratio</label>
+                    <input type="number" name="PE_ratio" placeholder="Enter min P/E Ratio"/>
+                </div>
+
+                <div class="checkbox-option">
+                    <label><input type="checkbox" name="filter_category" value="Avg_price" /> By Average Price</label>
+                    <input type="number" name="Avg_price" placeholder="Enter min Average Price"/>
+                </div>
+
+                <div class="checkbox-option">
+                    <label><input type="checkbox" name="filter_category" value="Market_cap" /> By Market Cap</label>
+                    <input type="number" name="Market_cap" placeholder="Enter min Market Cap"/>
+                </div>
+
+                <div class="checkbox-option">
+                    <label><input type="checkbox" name="filter_category" value="selected_sector" id="by_sector_checkbox" /> By Sector</label>
+                    <div class="sector-checkboxes">
+                        <input type="checkbox" id="sector1" name="selected_sector" value="Energy & Utilities"/>
+                        <label for="sector1">Energy & Utilities</label>
+                        <input type="checkbox" id="sector2" name="selected_sector" value="Transportation"/>
+                        <label for="sector2">Transportation</label>
+                        <input type="checkbox" id="sector3" name="selected_sector" value="Healthcare"/>
+                        <label for="sector3">Healthcare</label>
+                        <input type="checkbox" id="sector4" name="selected_sector" value="Financial Services"/>
+                        <label for="sector4">Financial Services</label>
+                        <input type="checkbox" id="sector5" name="selected_sector" value="Chemicals"/>
+                        <label for="sector5">Chemicals</label>
+                        <input type="checkbox" id="sector6" name="selected_sector" value="Technology"/>
+                        <label for="sector6">Technology</label>
+                        <input type="checkbox" id="sector7" name="selected_sector" value="Food & Consumer Goods"/>
+                        <label for="sector7">Food & Consumer Goods</label>
+                        <input type="checkbox" id="sector8" name="selected_sector" value="Metals & Construction"/>
+                        <label for="sector8">Metals & Construction</label>
+                        <input type="checkbox" id="sector9" name="selected_sector" value="Telecommunications"/>
+                        <label for="sector9">Telecommunications</label>
+                        <input type="checkbox" id="sector10" name="selected_sector" value="Pharmaceuticals & Agriculture"/>
+                        <label for="sector10">Pharmaceuticals & Agriculture</label>
+                    </div>
+                </div>
+            </div>
+            <button type="submit">GO</button>
+        </form>
+    </div>
+</div>
+
+
+
+<script>
+    // Function to toggle input bars based on checkbox selection
+    document
+        .querySelectorAll('.checkbox-group input[type="checkbox"]')
+        .forEach(function (checkbox) {
+            checkbox.addEventListener("change", function () {
+                var inputBar = this.parentElement.nextElementSibling;
+                if (this.checked) {
+                    inputBar.style.display = "block";
+                } else {
+                    inputBar.style.display = "none";
+                }
+            });
+        });
+
+    // Function to toggle sector checkboxes based on "By Sector" checkbox selection
+    document
+        .getElementById("by_sector_checkbox")
+        .addEventListener("change", function () {
+            var sectorCheckboxes = document.querySelector(".sector-checkboxes");
+            if (this.checked) {
+                sectorCheckboxes.style.display = "block";
+            } else {
+                sectorCheckboxes.style.display = "none";
+            }
+        });
+</script>
+  </body>
+</html>

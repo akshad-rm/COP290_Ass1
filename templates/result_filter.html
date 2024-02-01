@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Result Filter</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='style2.css') }}"
+    />
+  </head>
+  <body>
+    <div class="topnav">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="Company Logo" class="logo">
+      <a href="/dashboard">Home Page</a>
+      <a href="/explore">Explore</a>
+      <a href="/transactions">Transactions</a>
+      <a href="/logout" class="logout-button">Logout</a>
+    </div>
+
+    <h1 class="title">Result Filter</h1>
+
+    <div class="container">
+      <table width="1050px">
+        <thead>
+          <tr>
+            <th width="150px">Symbol</th>
+            <th width="150px">Company Name</th>
+            <th width="150px">Sector</th>
+            <th width="150px">Market Cap</th>
+            <th width="150px">Previous Close</th>
+            <th width="150px">P/E Ratio</th>
+            <th width="150px">Monthly Avg</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for company in filtered_companies_data %}
+          <tr>
+            <td width="1050px">{{ company.Symbol }}</td>
+            <td width="1050px">{{ company.Company_Name }}</td>
+            <td width="1050px">{{ company.Sector }}</td>
+            <td width="1050px">{{ company.Market_Cap }}</td>
+            <td width="1050px">{{ company.Previous_Close }}</td>
+            <td width="1050px">{{ company.PE_Ratio }}</td>
+            <td width="1050px">{{ company.Monthly_avg }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <a href="/explore" class="back-to-explore">Back to Explore</a>
+  </body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      .negative {
+          color: red;
+      }
+
+      .positive {
+          color: green;
+      }
+  </style>
+    <title>Live Data</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style_live_data.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div class="sidebar">
+        <h2>Companies</h2>
+        <ul>
+          {% for company in companies %}
+          <li
+            data-index="{{ loop.index0 }}"
+            data-symbol="{{ company.symbol }}"
+            data-price="{{ company.price }}"
+            data-change="{{ company.change }}"
+            data-pchange="{{ company.pchange }}"
+          >
+            {{ company.name }}
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="main-content">
+        <h2>Company Information</h2>
+        <div id="company-info">
+          <!-- Company information will be displayed here -->
+        </div>
+        <a href="/explore" class="back-to-explore">Back to Explore</a>
+      </div>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        var companiesList = document.querySelectorAll(".sidebar li");
+        var companyInfoDiv = document.getElementById("company-info");
+
+        companiesList.forEach(function (company) {
+    company.addEventListener("click", function () {
+        var symbol = this.dataset.symbol;
+        var name = this.textContent;
+        var price = this.dataset.price;
+        var change = parseFloat(this.dataset.change); // Parse to float
+        var pchange = parseFloat(this.dataset.pchange); // Parse to float
+
+        // Determine color classes based on the sign of change and pchange
+        var changeColorClass = change < 0 ? 'negative' : 'positive';
+        var pchangeColorClass = pchange < 0 ? 'negative' : 'positive';
+
+        var html = `
+            <table>
+                <tr><th>Symbol:</th><td>${symbol}</td></tr>
+                <tr><th>Name:</th><td>${name}</td></tr>
+                <tr><th>Price:</th><td>${price}</td></tr>
+                <tr><th>Price Change:</th><td class="${changeColorClass}">${change}</td></tr>
+                <tr><th>%-change:</th><td class="${pchangeColorClass}">${pchange}</td></tr>
+            </table>
+        `;
+        companyInfoDiv.innerHTML = html;
+    });
+});
+
+      });
+    </script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+  </body>
+</html>

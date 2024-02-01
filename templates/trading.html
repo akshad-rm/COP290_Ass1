@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stock Trading</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style_trader.css') }}"
+    />
+  </head>
+  <body>
+    <div class="topnav">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="Company Logo" class="logo">
+      <a href="/dashboard">Home Page</a>
+      <a href="/explore">Explore</a>
+      <a class="active" href="/transactions">Transactions</a>
+      <a href="/logout" class="logout-button">Logout</a>
+    </div>
+    <h1>_____________________________________________________________________________________</h1>
+
+    <div class="account-info">
+      <p>Total Investment: ₹{{ total_investment }}</p>
+      <p>Stocks Owned:</p>
+      <ul>
+        {% for stock in user_account.stocks %}
+        <li>
+          {{ stock.symbol }}: {{ stock.quantity }} shares (Investment: ₹{{stock.amount }})
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Symbol</th>
+          <th>Name</th>
+          <th>Price</th>
+          <th>Buy</th>
+          <th>Sell</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for stock in stocks %}
+        <tr>
+          <td>{{ stock['symbol'] }}</td>
+          <td>{{ stock['name'] }}</td>
+          <td>₹{{ stock['price'] }}</td>
+          <td>
+            <form method="post" action="{{ url_for('buy_stock') }}">
+              <input
+                type="hidden"
+                name="symbol"
+                value="{{ stock['symbol'] }}"
+              />
+              <input
+                type="number"
+                name="quantity"
+                min="1"
+                placeholder="Quantity"
+              />
+              <button type="submit">Buy</button>
+            </form>
+          </td>
+          <td>
+            <form method="post" action="{{ url_for('sell_stock') }}">
+              <input
+                type="hidden"
+                name="symbol"
+                value="{{ stock['symbol'] }}"
+              />
+              <input
+                type="number"
+                name="quantity"
+                min="1"
+                placeholder="Quantity"
+              />
+              <button type="submit">Sell</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>

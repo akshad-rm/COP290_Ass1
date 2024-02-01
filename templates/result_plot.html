@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interactive Plot with Cursor</title>
+    <!-- Include Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="topnav">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="Company Logo" class="logo">
+      <a href="/dashboard">Home Page</a>
+      <a href="/explore">Explore</a>
+      <a href="/transactions">Transactions</a>
+    </div>
+    <!-- Display the plot -->
+    <div id="plot"></div>
+    <!-- <a href="/explore" class="back-to-explore">Back to Explore</a> -->
+    <!-- Render the plot using Plotly.js -->
+    <script>
+      var plot_html = "{{ plot_html|safe }}";
+      Plotly.newPlot("plot", plot_html, {}, { darktheme: true });
+    </script>
+  </body>
+</html>

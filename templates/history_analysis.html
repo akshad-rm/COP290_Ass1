@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Stock Analysis over the past years</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+
+  <body>
+    <div class="topnav">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="Company Logo" class="logo">
+      <a href="/dashboard">Home Page</a>
+      <a class="active" href="/explore">Explore</a>
+      <a href="/transactions">Transactions</a>
+      <a href="/logout" class="logout-button">Logout</a>
+    </div>
+
+    <div class="container">
+      <form action="/intermediate" method="post">
+        <div class="checkbox-container">
+          <div class="checkbox-group">
+            <label class="checkbox-title">Companies</label>
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="Adani Enterprises Ltd."
+              />
+              Adani Enterprises Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="Adani Ports and Special Economic Zone Ltd."
+              />
+              Adani Ports and Special Economic Zone Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="Apollo Hospitals Enterprise Ltd."
+              />
+              Apollo Hospitals Enterprise Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="Asian Paints Ltd."
+              />
+              Asian Paints Ltd.</label
+            >
+            <label
+              ><input type="checkbox" name="company" value="Axis Bank Ltd." />
+              Axis Bank Ltd.</label
+            >
+            <label
+              ><input type="checkbox" name="company" value="Bajaj Auto Ltd." />
+              Bajaj Auto Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="Bajaj Finance Ltd."
+              />
+              Bajaj Finance Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="Bajaj Finserv Ltd."
+              />
+              Bajaj Finserv Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="Bharat Petroleum Corporation Ltd."
+              />
+              Bharat Petroleum Corporation Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="Bharti Airtel Ltd."
+              />
+              Bharti Airtel Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="Britannia Industries Ltd."
+              />
+              Britannia Industries Ltd.</label
+            >
+            <label
+              ><input type="checkbox" name="company" value="Cipla Ltd." /> Cipla
+              Ltd.</label
+            >
+            <label
+              ><input type="checkbox" name="company" value="Coal India Ltd." />
+              Coal India Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="Divi's Laboratories Ltd."
+              />
+              Divi's Laboratories Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="Dr. Reddy's Laboratories Ltd."
+              />
+              Dr. Reddy's Laboratories Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="Eicher Motors Ltd."
+              />
+              Eicher Motors Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="Grasim Industries Ltd."
+              />
+              Grasim Industries Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="HCL Technologies Ltd."
+              />
+              HCL Technologies Ltd.</label
+            >
+            <label
+              ><input type="checkbox" name="company" value="HDFC Bank Ltd." />
+              HDFC Bank Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="HDFC Life Insurance Company Ltd."
+              />
+              HDFC Life Insurance Company Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="Hero MotoCorp Ltd."
+              />
+              Hero MotoCorp Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="Hindalco Industries Ltd."
+              />
+              Hindalco Industries Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="Hindustan Unilever Ltd."
+              />
+              Hindustan Unilever Ltd.</label
+            >
+            <label
+              ><input type="checkbox" name="company" value="ICICI Bank Ltd." />
+              ICICI Bank Ltd.</label
+            >
+            <label
+              ><input type="checkbox" name="company" value="ITC Ltd." /> ITC
+              Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="IndusInd Bank Ltd."
+              />
+              IndusInd Bank Ltd.</label
+            >
+            <label
+              ><input type="checkbox" name="company" value="Infosys Ltd." />
+              Infosys Ltd.</label
+            >
+            <label
+              ><input type="checkbox" name="company" value="JSW Steel Ltd." />
+              JSW Steel Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="Kotak Mahindra Bank Ltd."
+              />
+              Kotak Mahindra Bank Ltd.</label
+            >
+            <label
+              ><input type="checkbox" name="company" value="LTIMindtree Ltd." />
+              LTIMindtree Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="Larsen & Toubro Ltd."
+              />
+              Larsen & Toubro Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="Maruti Suzuki India Ltd."
+              />
+              Maruti Suzuki India Ltd.</label
+            >
+            <label
+              ><input type="checkbox" name="company" value="NTPC Ltd." /> NTPC
+              Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="Nestle India Ltd."
+              />
+              Nestle India Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="Oil & Natural Gas Corporation Ltd."
+              />
+              Oil & Natural Gas Corporation Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="Power Grid Corporation of India Ltd."
+              />
+              Power Grid Corporation of India Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="Reliance Industries Ltd."
+              />
+              Reliance Industries Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="SBI Life Insurance Company Ltd."
+              />
+              SBI Life Insurance Company Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="State Bank of India"
+              />
+              State Bank of India</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="Sun Pharmaceutical Industries Ltd."
+              />
+              Sun Pharmaceutical Industries Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="Tata Consultancy Services Ltd."
+              />
+              Tata Consultancy Services Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="Tata Consumer Products Ltd."
+              />
+              Tata Consumer Products Ltd.</label
+            >
+            <label
+              ><input type="checkbox" name="company" value="Tata Motors Ltd." />
+              Tata Motors Ltd.</label
+            >
+            <label
+              ><input type="checkbox" name="company" value="Tata Steel Ltd." />
+              Tata Steel Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="Tech Mahindra Ltd."
+              />
+              Tech Mahindra Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="Titan Company Ltd."
+              />
+              Titan Company Ltd.</label
+            >
+            <label
+              ><input type="checkbox" name="company" value="UPL Ltd." /> UPL
+              Ltd.</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                name="company"
+                value="UltraTech Cement Ltd."
+              />
+              UltraTech Cement Ltd.</label
+            >
+            <label
+              ><input type="checkbox" name="company" value="Wipro Ltd." /> Wipro
+              Ltd.</label
+            >
+          </div>
+        </div>
+      
+
+      <div class="welcome-container">
+        <h1>Explore</h1>
+
+        
+          <div class="form-group">
+            <label for="fromDate">From Date:</label>
+            <input type="date" id="fromDate" name="fromDate" />
+          </div>
+
+          <div class="form-group">
+            <label for="toDate">To Date:</label>
+            <input type="date" id="toDate" name="toDate" />
+          </div>
+
+          <div class="form-group">
+            <label for="category">Category to Evaluate:</label>
+            <select id="category" name="category">
+              <option value="VALUE">VALUE</option>
+              <option value="OPEN">OPEN</option>
+              <option value="CLOSE">CLOSE</option>
+              <option value="HIGH">HIGH</option>
+              <option value="LOW">LOW</option>
+              <option value="VOLUME">VOLUME</option>
+              <option value="LTP">LTP</option>
+              <option value="NO OF TRADES">NO. OF TRADES</option>
+            </select>
+          </div>
+
+          <button type="submit">GO</button>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>
