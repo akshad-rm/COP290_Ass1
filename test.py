@@ -1,56 +1,29 @@
-import yfinance as yf
+
 import pandas as pd
 from datetime import date
+from jugaad_data.nse import NSELive
+import matplotlib.pyplot as plt
 
-text = """Thermal Coal
-Marine Shipping
-Medical Care Facilities
-Specialty Chemicals
-Banks - Regional
-Auto Manufacturers
-Credit Services
-Financial Conglomerates
-Oil & Gas Refining & Marketing
-Telecom Services
-Packaged Foods
-Drug Manufacturers - General
-Thermal Coal
-Drug Manufacturers - Specialty & Generic
-Drug Manufacturers - Specialty & Generic
-Auto Manufacturers
-Building Materials
-Information Technology Services
-Banks - Regional
-Insurance - Life
-Auto Manufacturers
-Aluminum
-Household & Personal Products
-Banks - Regional
-Tobacco
-Banks - Regional
-Information Technology Services
-Steel
-Banks - Regional
-Information Technology Services
-Engineering & Construction
-Auto Manufacturers
-Utilities - Regulated Electric
-Packaged Foods
-Oil & Gas Integrated
-Utilities - Regulated Electric
-Oil & Gas Refining & Marketing
-Insurance - Life
-Banks - Regional
-Drug Manufacturers - Specialty & Generic
-Information Technology Services
-Packaged Foods
-Auto Manufacturers
-Steel
-Information Technology Services
-Luxury Goods
-Agricultural Inputs
-Building Materials
-Information Technology Services"""
+n = NSELive()
+q = n.chart_data("SBIN")
+r =n.stock_quote("SBIN")
 
-# Split the text by line breaks and remove empty lines
-sec = [line.strip() for line in text.split('\n') if line.strip()]
+xy_coordinates = q["grapthData"]
+
+# Transpose the list to separate x and y values
+x_values, y_values = zip(*xy_coordinates)
+
+# Plot the graph
+if r["priceInfo"]["change"] < 0:
+    plt.plot(x_values, y_values, linestyle='-',color="red")
+else:
+    plt.plot(x_values, y_values, linestyle='-',color="green")
+
+
+# Add labels and title
+plt.xlabel('')
+plt.ylabel('Stock Price')
+plt.title('SBIN')
+plt.gca().set_facecolor('#333')
+# Show the plot
+plt.show()

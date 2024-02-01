@@ -6,13 +6,14 @@ from datetime import date,datetime,timedelta
 from jugaad_data.nse import stock_df,NSELive
 import pandas as pd
 import yfinance as yf
+import matplotlib.pyplot as plt
 from sqlalchemy.orm import relationship
 from flask_migrate import Migrate 
 import filter_definitions
 
 app = Flask(__name__)
 
-app.secret_key = 'your_secret_key'  
+app.secret_key = 'your_secret_key'  # Replace with your actual secret key
 
 
 #---------------Map----------------------------------------------------
@@ -186,14 +187,28 @@ stocks_index = {
 #-----------------------feeding live data----------------------------
 nse_data_obj = NSELive()
 company_stocks=[]
+company_plots =[]
 for company in company_symbol_map:
     quote = nse_data_obj.stock_quote(company_symbol_map[company])
     temp_dict = {}
     temp_dict["symbol"] = company_symbol_map[company]
     temp_dict["name"] = company
     temp_dict["price"] = quote["priceInfo"]["lastPrice"]
+    temp_dict["change"] = quote["priceInfo"]["change"]
+    temp_dict["pchange"] = quote["priceInfo"]["pChange"]
     company_stocks.append(temp_dict)
-
+    # graph_maker = nse_data_obj.chart_data(company_symbol_map[company])
+    # xy_coordinates = graph_maker["grapthData"]
+    # x_values, y_values = zip(*xy_coordinates)
+    # if quote["priceInfo"]["change"] < 0:
+    #     plt.plot(x_values, y_values, linestyle='-',color="red")
+    # else:
+    #     plt.plot(x_values, y_values, linestyle='-',color="green")
+    # plt.xlabel('')
+    # plt.ylabel('Stock Price')
+    # plt.title(company_symbol_map[company])
+    # plt.gca().set_facecolor('#333')
+    # company_plots.append(plt)
 #---------------------------------------------------------------------
 
 
@@ -213,6 +228,7 @@ class Stock(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     symbol = db.Column(db.String(10), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
+    amount = db.Column(db.Float, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 class User(db.Model):
@@ -458,8 +474,9 @@ def buy_stock():
         user_stock = Stock.query.filter_by(symbol=symbol, user_id=user.id).first()
         if user_stock:
             user_stock.quantity += quantity
+            user_stock.amount += investment_amount
         else:
-            user_stock = Stock(symbol=symbol, quantity=quantity, user_id=user.id)
+            user_stock = Stock(symbol=symbol, quantity=quantity,amount=investment_amount, user_id=user.id)
             db.session.add(user_stock)
         db.session.commit()
 
@@ -479,6 +496,7 @@ def sell_stock():
 
         # Update the investments accordingly in the database
         investment_amount = company_stocks[stocks_index[symbol]]['price'] * quantity
+        user_stock.amount -= investment_amount
         investment = Investment(symbol=symbol, amount=-investment_amount, user_id=user.id)
         db.session.add(investment)
         db.session.commit()
@@ -494,8 +512,9 @@ def sell_stock():
 
 @app.route('/live_data')
 def live_data():
-    company_data = filter_definitions.nifty_50_data
-    return render_template('live_data.html',companies = company_data)
+
+    # company_data = filter_definitions.nifty_50_data
+    return render_template('live_data.html',companies = company_stocks)
 
 
 @app.route('/logout')
