@@ -11,16 +11,16 @@ body {
 }
 
 .container {
-    display: flex; 
-    justify-content: space-around;
-    background-color: #04aa6d; 
+    display: flex; /* Use flexbox to align items horizontally */
+    justify-content: space-around; /* Add space around items */
+    background-color: #04aa6d; /* Change to the desired color */
     border-radius: 10%;
 }
 
 .checkbox-container {
-    margin-right: 2px; 
-    position: absolute; 
-    left: 2%; 
+    margin-right: 2px; /* Adjusted margin for separation */
+    position: absolute; /* Position absolutely */
+    left: 2%; /* Align to the left */
     top: 10%;
 }
 
@@ -106,7 +106,14 @@ button:hover {
     top: 0;
     width: 100%;
 }
-
+.topnav .logo {
+    max-width: 100px;
+    max-height: 60px;
+    margin-right: 10px; 
+    margin-left: 400px;
+    margin-top: 5px;
+    justify-content: center;
+  }
 .topnav a {
     float: left;
     color: #f2f2f2;
@@ -125,6 +132,16 @@ button:hover {
     background-color: #04AA6D;
     color: white;
 }
+.topnav a.logout-button {
+    float: right;
+    background-color: red; 
+    border-radius: 5px;
+} 
+  .topnav a.logout-button:hover {
+    background-color: darkred; 
+  }
+  
+  
 
 /* Style for checkboxes */
 .checkbox-group label {
@@ -165,3 +182,16 @@ button:hover {
     margin-right: 10px;
 }
 
+/* .back-to-explore {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-top: 20px;
+    background-color: #04aa6d;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.back-to-explore:hover {
+    background-color: #038e5e;
+} */
