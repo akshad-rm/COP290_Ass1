@@ -47,11 +47,9 @@ def get_nifty_50_data():
 
 nifty_50_data = get_nifty_50_data()
 
-# Convert the list of dictionaries to a DataFrame
 df = pd.DataFrame(nifty_50_data)
 df.at[43,"PE_Ratio"] = "-26.3"
 df["PE_Ratio"] = df["PE_Ratio"].astype(float)
-# Display the DataFrame
 
 def filter_by_pe(x):
     s = "PE_Ratio >" + str(x)

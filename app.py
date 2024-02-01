@@ -6,7 +6,6 @@ from datetime import date,datetime,timedelta
 from jugaad_data.nse import stock_df,NSELive
 import pandas as pd
 import yfinance as yf
-import matplotlib.pyplot as plt
 from sqlalchemy.orm import relationship
 from flask_migrate import Migrate 
 import filter_definitions
@@ -197,18 +196,6 @@ for company in company_symbol_map:
     temp_dict["change"] = quote["priceInfo"]["change"]
     temp_dict["pchange"] = quote["priceInfo"]["pChange"]
     company_stocks.append(temp_dict)
-    # graph_maker = nse_data_obj.chart_data(company_symbol_map[company])
-    # xy_coordinates = graph_maker["grapthData"]
-    # x_values, y_values = zip(*xy_coordinates)
-    # if quote["priceInfo"]["change"] < 0:
-    #     plt.plot(x_values, y_values, linestyle='-',color="red")
-    # else:
-    #     plt.plot(x_values, y_values, linestyle='-',color="green")
-    # plt.xlabel('')
-    # plt.ylabel('Stock Price')
-    # plt.title(company_symbol_map[company])
-    # plt.gca().set_facecolor('#333')
-    # company_plots.append(plt)
 #---------------------------------------------------------------------
 
 
@@ -237,11 +224,6 @@ class User(db.Model):
     password_hash = db.Column(db.String(200), nullable=False)
     investments = db.relationship('Investment', backref='user', lazy=True)
     stocks = db.relationship('Stock', backref='user', lazy=True)
-
-    
-
-
-
 
 
 # Initialize Database within Application Context
@@ -387,12 +369,6 @@ def intermediate_filter():
         return redirect(url_for('filters'))
 
 
-
-
-
-
-
-
 @app.route('/intermediate',methods = ['POST'])
 def intermediate():
     if request.method == 'POST':
@@ -432,7 +408,6 @@ def intermediate():
                 type="date"
             )
         )
-        #fig.show()
         plot_html = fig.to_html(full_html = False)
         
         return render_template('result_plot.html', plot_html=plot_html)
@@ -464,13 +439,11 @@ def buy_stock():
 
     stock = next((s for s in company_stocks if s['symbol'] == symbol), None)
     if stock:
-        # Update the investments in the database
         investment_amount = stock['price'] * quantity
         investment = Investment(symbol=symbol, amount=investment_amount, user_id=user.id)
         db.session.add(investment)
         db.session.commit()
 
-        # Add or update the stock in the user's portfolio in the database
         user_stock = Stock.query.filter_by(symbol=symbol, user_id=user.id).first()
         if user_stock:
             user_stock.quantity += quantity
@@ -490,18 +463,15 @@ def sell_stock():
 
     user_stock = Stock.query.filter_by(symbol=symbol, user_id=user.id).first()
     if user_stock and user_stock.quantity >= quantity:
-        # Subtract the sold quantity from the user's portfolio in the database
         user_stock.quantity -= quantity
         db.session.commit()
 
-        # Update the investments accordingly in the database
         investment_amount = company_stocks[stocks_index[symbol]]['price'] * quantity
         user_stock.amount -= investment_amount
         investment = Investment(symbol=symbol, amount=-investment_amount, user_id=user.id)
         db.session.add(investment)
         db.session.commit()
 
-        # Remove the stock from the portfolio if the quantity becomes zero in the database
         if user_stock.quantity == 0:
             db.session.delete(user_stock)
             db.session.commit()
@@ -513,7 +483,6 @@ def sell_stock():
 @app.route('/live_data')
 def live_data():
 
-    # company_data = filter_definitions.nifty_50_data
     return render_template('live_data.html',companies = company_stocks)
 
 
